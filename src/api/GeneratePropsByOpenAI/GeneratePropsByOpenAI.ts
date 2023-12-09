@@ -44,13 +44,30 @@ async function callChatCompletionAPI(
     });
 }
 
+function getOpenAIAPIKeyOrDusplayInputDialog(): string {
+  const key = "openAIAPIKey";
+  const openAIAPIKey = window.localStorage.getItem(key);
+  const isOpenAIAPIKeyExists =
+    openAIAPIKey != null && openAIAPIKey !== "undefined" && openAIAPIKey !== "";
+  if (isOpenAIAPIKeyExists && openAIAPIKey !== null) {
+    return openAIAPIKey;
+  } else {
+    const userInputKey = window.prompt("Please enter your OpenAI key");
+    if (userInputKey !== null) {
+      window.localStorage.setItem(key, userInputKey);
+      return userInputKey;
+    } else {
+      return "";
+    }
+  }
+}
+
 export async function GenerateByOpenAI(
   promptUserInput: string,
   jsonSchema: string,
   mustache: string,
 ) {
-  console.log(import.meta.env.VITE_OPENAI_KEY);
-  const openAIAPIKey = import.meta.env.VITE_OPENAI_KEY;
+  const openAIAPIKey = getOpenAIAPIKeyOrDusplayInputDialog();
   const MODEL =
     import.meta.env.VITE_OPENAI_DEFAULT_MODEL || "gpt-4-1106-preview";
   const maxTokens = 1600;
